@@ -31,6 +31,12 @@ START=`date +"%s"`
 BASE=$PWD
 TMPDIR="tmp.$$/"
 
+if [[ -x /usr/bin/gzcat ]]; then
+ export GZCAT="gzcat" 		# POSIX/BSD Systems (MacOS/Solaris, etc)
+else
+ export GZCAT="zcat" 		# GNU Systems (Linux)
+fi
+
 
 ## Download SmartOS USB (Raw) Image
 printf "\n==> Downloading ${RELEASE}....\n\n"
@@ -75,7 +81,7 @@ VBoxManage storageattach "${BOXNAME}" --storagectl "SATA Controller" --port 0 --
 VBoxManage storageattach "${BOXNAME}" --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium emptydrive
 # Create empty 40G device for Zpool:
 #VBoxManage createhd --filename ./zpool.vmdk --size ${ZPOOL_SIZE}
-gzcat ../smartos-zpool.vmdk.gz > zpool.vmdk
+$GZCAT ../smartos-zpool.vmdk.gz > zpool.vmdk
 VBoxManage storageattach "${BOXNAME}" --storagectl "SATA Controller" --port 2 --device 0 --type hdd --medium ./zpool.vmdk
 
 ## Package & Delete
