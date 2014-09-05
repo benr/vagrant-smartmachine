@@ -24,7 +24,8 @@ fi
 
 URL="${RELEASE}/smartos-${RELEASE}-USB.img.bz2"
 FILENAME="smartos-${RELEASE}-USB"
-BOXNAME="smartos-${RELEASE}"
+BOXNAME="smartos-${RELEASE}-$$"
+OVA_BOXNAME="smartos-${RELEASE}"
 
 START=`date +"%s"`
 BASE=$PWD
@@ -33,6 +34,10 @@ TMPDIR="tmp.$$/"
 
 ## Download SmartOS USB (Raw) Image
 printf "\n==> Downloading ${RELEASE}....\n\n"
+if [[ ! -d smartos_releases ]]; then
+  mkdir smartos_releases
+fi
+
 cd $BASE/smartos_releases
 if [[ -f ${FILENAME}.img.bz2 ]]; then
   echo "${FILENAME} already downloaded!"
@@ -76,10 +81,10 @@ VBoxManage storageattach "${BOXNAME}" --storagectl "SATA Controller" --port 2 --
 ## Package & Delete
 
 printf "\n==> Packaging OVA & Deleting VM\n"
-VBoxManage export "${BOXNAME}" --output ../${BOXNAME}.ova
+VBoxManage export "${BOXNAME}" --output ../${OVA_BOXNAME}.ova
 VBoxManage unregistervm "${BOXNAME}" --delete
 
-printf "\nOVA is ready: ${BOXNAME}.ova\n"
+printf "\nOVA is ready: ${OVA_BOXNAME}.ova\n"
 
 ## Cleanup
 cd $BASE
